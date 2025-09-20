@@ -9,7 +9,7 @@ const videoSchema = new mongoose.Schema({
         trim: true
     },
     description: {
-        type: String,
+        type: String, 
         required: true,
         trim: true
     },
@@ -31,7 +31,7 @@ const videoSchema = new mongoose.Schema({
     },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: "User"
     },
     videoFile: {
         type: String, // URL from the cloudinary
