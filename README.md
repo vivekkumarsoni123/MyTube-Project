@@ -1,4 +1,4 @@
-# ChaiAurCode
+# A SocialMedia Backend
 
 A modern backend API for user authentication and profile management, built with Node.js, Express, and MongoDB.
 
