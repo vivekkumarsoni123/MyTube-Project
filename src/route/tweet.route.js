@@ -7,6 +7,7 @@ import {
 } from "../controller/tweet.controller.js"
 import {jwtVerify} from "../middleware/auth.middleware.js"
 
+
 const router = Router();
 router.use(jwtVerify); // Apply verifyJWT middleware to all routes in this file
 
