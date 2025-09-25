@@ -132,7 +132,7 @@ These instructions will help you get a copy of the project running on your local
 | `GET`  | `/api/v1/comments/`      | Comment on videos           |
 
 
-```
+
 
 ## 🧪 Demo / Screenshots
 
@@ -155,9 +155,9 @@ These instructions will help you get a copy of the project running on your local
 <img width="1891" height="967" alt="image" src="https://github.com/user-attachments/assets/3f7b1ded-e9fa-478c-815b-7de72af5e941" />
 
 
-```
 
-## 🤝 Contributing
+
+## 🤝 Contribution
 
 Contributions are welcome! To contribute:
 
