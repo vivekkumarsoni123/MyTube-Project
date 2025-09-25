@@ -49,8 +49,6 @@ root
 └── .gitignore
 
 
-dify this to match your actual folder organization.
-
 ## 🚀 Getting Started
 
 These instructions will help you get a copy of the project running on your local machine for development and testing.
