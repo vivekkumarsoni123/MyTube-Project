@@ -29,7 +29,7 @@ A full-stack video streaming web application built to mimic YouTube’s core fun
 
 ## 🧩 Project Structure
 
-```
+
 
 root
 │
@@ -48,7 +48,7 @@ root
 ├── README.md       # This file
 └── .gitignore
 
-````
+
 dify this to match your actual folder organization.
 
 ## 🚀 Getting Started
