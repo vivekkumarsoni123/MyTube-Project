@@ -1,8 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useSidebar } from "../context/SidebarContext";
 
 export default function Sidebar() {
   const { user } = useAuth();
+  const { isSidebarOpen, closeSidebar } = useSidebar();
   const location = useLocation();
 
   const navigationItems = [
@@ -30,8 +32,36 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 bg-neutral-900 min-h-screen p-4">
-      <div className="space-y-2">
+    <>
+      {/* Mobile overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div className={`
+        fixed lg:static top-0 left-0 z-50 lg:z-auto
+        w-64 bg-neutral-900 min-h-screen p-4
+        transform transition-transform duration-300 ease-in-out
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Close button for mobile */}
+        <div className="flex justify-end mb-4 lg:hidden">
+          <button
+            onClick={closeSidebar}
+            className="p-2 rounded-lg hover:bg-neutral-800 transition-colors"
+            aria-label="Close sidebar"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="space-y-2">
         {/* Main Navigation */}
         <div className="space-y-1">
           {navigationItems.map((item) => (
@@ -131,8 +161,9 @@ export default function Sidebar() {
             Sports
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

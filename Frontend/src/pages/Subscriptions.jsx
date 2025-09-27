@@ -39,7 +39,7 @@ export default function Subscriptions() {
     return (
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-4 lg:ml-0">
           <div className="max-w-7xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Subscriptions</h1>
             <div className="text-center py-12">
@@ -54,7 +54,7 @@ export default function Subscriptions() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 lg:ml-0">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">Subscriptions</h1>
           

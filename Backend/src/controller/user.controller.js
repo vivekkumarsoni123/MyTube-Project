@@ -1,7 +1,7 @@
 import {asyncHandler} from '../utils/asyncHandler.js'
 import {ApiError} from '../utils/ApiError.js'
 import {User} from '../model/User.model.js'
-import { uploadFileOnCloudinary } from '../utils/cloudinary.js';
+import { uploadFileOnCloudinary, deleteFileFromCloudinary, extractPublicIdFromUrl } from '../utils/cloudinary.js';
 import {ApiResponse} from '../utils/ApiResponse.js'
 import jwt, { decode } from 'jsonwebtoken'
 import mongoose from 'mongoose';
@@ -314,6 +314,20 @@ const updateAvatar = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Avatar file is required")
     }
 
+    // Delete old avatar from Cloudinary if it exists
+    if (user.avatar) {
+        const oldAvatarPublicId = extractPublicIdFromUrl(user.avatar);
+        if (oldAvatarPublicId) {
+            try {
+                await deleteFileFromCloudinary(oldAvatarPublicId, "image");
+                console.log("Old avatar deleted from Cloudinary:", oldAvatarPublicId);
+            } catch (err) {
+                console.error("Error deleting old avatar from Cloudinary:", err);
+                // Don't fail the request if old file deletion fails
+            }
+        }
+    }
+
     const avatar = await uploadFileOnCloudinary(avatarFile.buffer)
 
     if (!avatar) {
@@ -340,6 +354,20 @@ const updateCoverImage = asyncHandler( async (req, res) => {
 
     if (!coverImageFile) {
         throw new ApiError(400, "coverImage file is required")
+    }
+
+    // Delete old cover image from Cloudinary if it exists
+    if (user.coverImage) {
+        const oldCoverImagePublicId = extractPublicIdFromUrl(user.coverImage);
+        if (oldCoverImagePublicId) {
+            try {
+                await deleteFileFromCloudinary(oldCoverImagePublicId, "image");
+                console.log("Old cover image deleted from Cloudinary:", oldCoverImagePublicId);
+            } catch (err) {
+                console.error("Error deleting old cover image from Cloudinary:", err);
+                // Don't fail the request if old file deletion fails
+            }
+        }
     }
 
     const coverImage = await uploadFileOnCloudinary(coverImageFile.buffer)

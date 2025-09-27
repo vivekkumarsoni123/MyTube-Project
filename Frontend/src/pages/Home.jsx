@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <div className="flex">
       <Sidebar />
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 lg:ml-0">
         <div className="max-w-7xl mx-auto">
           {loading && <div className="text-neutral-400">Loading...</div>}
           {error && <div className="text-red-400">{error}</div>}
