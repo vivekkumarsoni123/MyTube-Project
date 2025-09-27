@@ -14,13 +14,12 @@ const createPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Unauthorized, First Login or SignUp")
     }
 
-    const newPlaylist = await Playlist.create( 
-        {
-            name,
-            description,
-            owner: req?.user?._id
-        }
-    )
+    const newPlaylist = await Playlist.create({
+        name,
+        description,
+        owner: req?.user?._id,
+        videos: []
+    })
     return res.status(201)
     .json(new ApiResponse(201, newPlaylist, "Playlist created successfully"))
 })
@@ -74,12 +73,11 @@ const getPlaylistById = asyncHandler(async (req, res) => {
     const playlist = await Playlist.findById(playlistId)
     .populate({
         path: 'videos',
-        populate: {
-            path: 'owner',
-            select: 'username avatar _id'
-        }
+        select: 'title description thumbnail views isPublished videoFile owner',
+        populate: { path: 'owner', select: 'username avatar _id' }
     })
     .select("name description videos owner")
+    .lean()
 
     if(!playlist) {
         throw new ApiError(404, "Playlist not found")
@@ -109,11 +107,18 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
     }
 
     // Add atomically without duplicates
-    const updated = await Playlist.findOneAndUpdate(
+    await Playlist.updateOne(
         { _id: playlistId, owner: playlist.owner },
-        { $addToSet: { videos: new mongoose.Types.ObjectId(videoId) } },
-        { new: true }
+        { $addToSet: { videos: new mongoose.Types.ObjectId(videoId) } }
     )
+
+    const updated = await Playlist.findById(playlistId)
+        .populate({
+            path: 'videos',
+            select: 'title description thumbnail views isPublished videoFile owner',
+            populate: { path: 'owner', select: 'username avatar _id' }
+        })
+        .select('name description videos owner')
 
     return res.status(200)
     .json(new ApiResponse(200, updated, "Video added to playlist successfully"))
@@ -134,20 +139,18 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Playlist not found")
     }
 
-    const videoIndex = playlist.videos.indexOf(videoId)
-    if(videoIndex === -1) {
+    if(!playlist.videos?.length) {
         throw new ApiError(404, "Video not found in playlist")
     }
 
-    // To replace the video at videoIndex with newVideoId:
-    // playlist.videos.splice(videoIndex, 1, newVideoId)
-
-    playlist.videos.splice(videoIndex, 1)
-
-    await playlist.save({validateBeforeSave: true})
+    const updated = await Playlist.findByIdAndUpdate(
+        playlistId,
+        { $pull: { videos: new mongoose.Types.ObjectId(videoId) } },
+        { new: true }
+    )
 
     return res.status(200)
-    .json(new ApiResponse(200, playlist, "Video removed from playlist successfully"))
+    .json(new ApiResponse(200, updated, "Video removed from playlist successfully"))
 
 })
 

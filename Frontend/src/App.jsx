@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Tweets from "./pages/Tweets";
 import Subscriptions from "./pages/Subscriptions";
 import Library from "./pages/Library";
+import PlaylistDetails from "./pages/PlaylistDetails";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
             <Route path="/tweets" element={<Tweets />} />
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/library" element={<Library />} />
+          <Route path="/playlist/:playlistId" element={<PlaylistDetails />} />
           </Route>
           <Route path="/" element={<Home />} />
           <Route path="/watch/:id" element={<Watch />} />

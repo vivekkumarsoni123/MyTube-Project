@@ -1,7 +1,7 @@
 // Axios API client with JWT cookies and optional bearer token support
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL ;
 
 export const api = axios.create({
   baseURL: apiBaseUrl,

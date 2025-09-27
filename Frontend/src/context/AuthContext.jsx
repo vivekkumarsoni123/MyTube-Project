@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(async (payload) => {
     const { data } = await endpoints.login(payload);
-    const accessToken = data?.data?.accessToken || data?.accessToken;
+    const accessToken = data?.data?.accessToken || data?.accessToken || data?.user?.accessToken || data?.data?.user?.accessToken;
     if (accessToken) localStorage.setItem("accessToken", accessToken);
     await fetchMe();
     return data;

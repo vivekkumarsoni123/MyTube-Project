@@ -54,12 +54,14 @@ const refreshAccessToken = asyncHandler( async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "none",
+        path: "/"
     }
 
     res.status(200)
-    .cookie("refreshToken", refreshToken, options)
-    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, { ...options, maxAge: 7 * 24 * 60 * 60 * 1000 })
+    .cookie("accessToken", accessToken, { ...options, maxAge: 15 * 60 * 1000 })
     .json(new ApiResponse(200, {accessToken, refreshToken}, "Access token refreshed successfully"))
     
 })
@@ -95,11 +97,14 @@ const loginUser = asyncHandler( async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
+        path: "/",
+        maxAge: 7 * 24 * 60 * 60 * 1000
     }
 
     res.status(200)
     .cookie("refreshToken", refreshToken, options)
-    .cookie("accessToken", accessToken, options)
+    .cookie("accessToken", accessToken, { ...options, maxAge: 15 * 60 * 1000 })
     .json(
         new ApiResponse(200, {
             user: {
@@ -131,7 +136,9 @@ const logoutUser = asyncHandler( async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: "none",
+        path: "/"
     }
 
     res.status(200)
