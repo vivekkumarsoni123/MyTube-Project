@@ -73,10 +73,19 @@ export default function Channel() {
   }
 
   async function handleDeleteVideo(video) {
+    console.log("Delete button clicked for video:", video);
     if (!confirm(`Are you sure you want to delete "${video.title}"?`)) return;
     
+    const videoId = video._id || video.id;
+    if (!videoId) {
+      alert("Video ID not found");
+      return;
+    }
+    
     try {
-      await endpoints.deleteVideo(video._id || video.id);
+      console.log("Attempting to delete video with ID:", videoId);
+      await endpoints.deleteVideo(videoId);
+      console.log("Video deleted successfully");
       // Refresh videos list
       if (channel?._id) {
         const vidsRes = await endpoints.getVideos({ userId: channel._id });
@@ -86,11 +95,13 @@ export default function Channel() {
       }
       alert("Video deleted successfully");
     } catch (e) {
+      console.error("Delete video error:", e);
       alert(e?.response?.data?.message || "Failed to delete video");
     }
   }
 
   function handleEditVideo(video) {
+    console.log("Edit button clicked for video:", video);
     // For now, we'll use a simple prompt-based approach
     // Later this can be replaced with a proper modal
     const newTitle = prompt("Enter new title:", video.title);
@@ -98,13 +109,21 @@ export default function Channel() {
     
     const newDescription = prompt("Enter new description:", video.description || "");
     
+    const videoId = video._id || video.id;
+    if (!videoId) {
+      alert("Video ID not found");
+      return;
+    }
+    
     // Update video
-    updateVideoDetails(video._id || video.id, { title: newTitle, description: newDescription });
+    updateVideoDetails(videoId, { title: newTitle, description: newDescription });
   }
 
   async function updateVideoDetails(videoId, updates) {
     try {
+      console.log("Updating video with ID:", videoId, "Updates:", updates);
       await endpoints.updateVideo(videoId, updates);
+      console.log("Video updated successfully");
       // Refresh videos list
       if (channel?._id) {
         const vidsRes = await endpoints.getVideos({ userId: channel._id });
@@ -114,6 +133,7 @@ export default function Channel() {
       }
       alert("Video updated successfully");
     } catch (e) {
+      console.error("Update video error:", e);
       alert(e?.response?.data?.message || "Failed to update video");
     }
   }

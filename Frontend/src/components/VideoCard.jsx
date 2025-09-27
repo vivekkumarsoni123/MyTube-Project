@@ -8,7 +8,16 @@ export default function VideoCard({ video, showActions = false, onSave, onDelete
   const channelName = video?.owner?.username || video?.channel?.username || video?.ownerName || "Channel";
   const views = video?.views ?? 0;
   const id = video?._id || video?.id;
-  const isOwner = user && video?.owner?._id && user._id === video.owner._id;
+  const isOwner = user && video?.owner?._id && String(user._id) === String(video.owner._id);
+  
+  console.log("VideoCard render:", { 
+    video, 
+    user, 
+    isOwner, 
+    showActions,
+    user_id: user?._id,
+    video_owner_id: video?.owner?._id
+  });
 
   return (
     <div className="group block">
@@ -42,8 +51,28 @@ export default function VideoCard({ video, showActions = false, onSave, onDelete
             )}
             {isOwner && (
               <>
-                <button onClick={()=>onEdit?.(video)} className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-xs text-white">Edit</button>
-                <button onClick={()=>onDelete?.(video)} className="px-2 py-1 rounded bg-red-600 hover:bg-red-500 text-xs text-white">Delete</button>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Edit button clicked in VideoCard");
+                    onEdit?.(video);
+                  }} 
+                  className="px-2 py-1 rounded bg-blue-600 hover:bg-blue-500 text-xs text-white"
+                >
+                  Edit
+                </button>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Delete button clicked in VideoCard");
+                    onDelete?.(video);
+                  }} 
+                  className="px-2 py-1 rounded bg-red-600 hover:bg-red-500 text-xs text-white"
+                >
+                  Delete
+                </button>
               </>
             )}
           </div>

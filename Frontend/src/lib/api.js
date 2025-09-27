@@ -1,7 +1,7 @@
 // Axios API client with JWT cookies and optional bearer token support
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL ;
+const apiBaseUrl = import.meta.env?.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
 export const api = axios.create({
   baseURL: apiBaseUrl,
@@ -51,10 +51,14 @@ api.interceptors.response.use(
       isRefreshing = true;
       try {
         const { data } = await api.post("/users/refreshToken");
-        const newToken = data?.data?.accessToken || data?.accessToken;
-        if (newToken) {
-          localStorage.setItem("accessToken", newToken);
-          onRefreshed(newToken);
+        const newAccessToken = data?.data?.accessToken || data?.accessToken;
+        const newRefreshToken = data?.data?.refreshToken || data?.refreshToken;
+        if (newAccessToken) {
+          localStorage.setItem("accessToken", newAccessToken);
+          if (newRefreshToken) {
+            localStorage.setItem("refreshToken", newRefreshToken);
+          }
+          onRefreshed(newAccessToken);
         } else {
           onRefreshed(null);
         }
@@ -62,6 +66,7 @@ api.interceptors.response.use(
       } catch (e) {
         onRefreshed(null);
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         return Promise.reject(e);
       } finally {
         isRefreshing = false;

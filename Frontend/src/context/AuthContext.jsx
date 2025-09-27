@@ -25,19 +25,27 @@ export function AuthProvider({ children }) {
   const login = useCallback(async (payload) => {
     const { data } = await endpoints.login(payload);
     const accessToken = data?.data?.accessToken || data?.accessToken || data?.user?.accessToken || data?.data?.user?.accessToken;
+    const refreshToken = data?.data?.refreshToken || data?.refreshToken || data?.user?.refreshToken || data?.data?.user?.refreshToken;
     if (accessToken) localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
     await fetchMe();
     return data;
   }, [fetchMe]);
 
   const register = useCallback(async (formData) => {
     const { data } = await endpoints.register(formData);
+    const accessToken = data?.data?.accessToken || data?.accessToken || data?.user?.accessToken || data?.data?.user?.accessToken;
+    const refreshToken = data?.data?.refreshToken || data?.refreshToken || data?.user?.refreshToken || data?.data?.user?.refreshToken;
+    if (accessToken) localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+    await fetchMe();
     return data;
-  }, []);
+  }, [fetchMe]);
 
   const logout = useCallback(async () => {
     try { await endpoints.logout(); } catch (_) {}
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     setUser(null);
   }, []);
 

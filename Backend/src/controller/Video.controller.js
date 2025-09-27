@@ -71,6 +71,28 @@ const getAllVideos = asyncHandler(async (req, res) => {
                     }
                 },
                 {
+                    $lookup: {
+                        from: "users",
+                        localField: "owner",
+                        foreignField: "_id",
+                        as: "owner",
+                        pipeline: [
+                            {
+                                $project: {
+                                    username: 1,
+                                    avatar: 1,
+                                    _id: 1
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    $addFields: {
+                        owner: { $first: "$owner" }
+                    }
+                },
+                {
                     $project: {
                         title: 1,
                         description: 1,
@@ -78,7 +100,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
                         thumbnail: 1,
                         views: 1,
                         isPublished: 1,
-                        videoFile: 1
+                        videoFile: 1,
+                        owner: 1
                     }
                 }
             ]
@@ -185,7 +208,7 @@ const incrementViewsAndHistory = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    console.log("Update video request:", { videoId, userId: req?.user?._id, body: req.body });
     
     if(!req?.user?._id) {
         throw new ApiError(401, "Unauthorized, First Login or SignUp")
@@ -197,24 +220,25 @@ const updateVideo = asyncHandler(async (req, res) => {
     }
 
     const thumbnailFile = req?.file;
+    let updateData = {
+        title: title,
+        description: description
+    };
 
-    if(!thumbnailFile) {
-        throw new ApiError(400, "Thumbnail file is required")
-    }
+    // Only update thumbnail if a new file is provided
+    if(thumbnailFile) {
+        const thumbnail = await uploadFileOnCloudinary(thumbnailFile.buffer);
 
-    const thumbnail = await uploadFileOnCloudinary(thumbnailFile.buffer);
+        if(!thumbnail) {
+            throw new ApiError(500, "Error while uploading thumbnail on cloudinary")
+        }
 
-    if(!thumbnail) {
-        throw new ApiError(500, "Error while uploading thumbnail on cloudinary")
+        updateData.thumbnail = thumbnail?.url;
     }
 
     const video = await Video.findByIdAndUpdate(videoId, 
         {
-            $set: {
-                title: title,
-                description: description,
-                thumbnail: thumbnail?.url
-            }
+            $set: updateData
         },
         { new: true } // return the updated document
     );
@@ -223,23 +247,20 @@ const updateVideo = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Error while updating video details")
     }
 
-
-
     return res.status(200)
     .json(new ApiResponse(200, video, "Video Details updated Successfully"))
-    
-
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
-    //TODO: delete video
-
+    console.log("Delete video request:", { videoId, userId: req?.user?._id });
+    
     if(!req?.user?._id) {
         throw new ApiError(401, "Unauthorized, First Login or SignUp")
     }
 
     const video = await Video?.findByIdAndDelete(videoId);
+    console.log("Video found for deletion:", video);
 
     if(!video) {
         throw new ApiError(404, "Video not found")
