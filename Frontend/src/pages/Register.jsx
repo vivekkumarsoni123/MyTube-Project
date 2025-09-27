@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Register() {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const [form, setForm] = useState({ username: "", fullName: "", email: "", password: "" });
+  const [form, setForm] = useState({ username: "", fullname: "", email: "", password: "" });
   const [avatar, setAvatar] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
   const [error, setError] = useState("");
@@ -38,7 +38,7 @@ export default function Register() {
         {error && <div className="text-red-400 text-sm">{error}</div>}
         <div className="grid grid-cols-2 gap-3">
           <input className="px-3 py-2 rounded-lg bg-neutral-800" placeholder="Username" value={form.username} onChange={(e)=>updateField("username", e.target.value)} required />
-          <input className="px-3 py-2 rounded-lg bg-neutral-800" placeholder="Full name" value={form.fullName} onChange={(e)=>updateField("fullName", e.target.value)} required />
+          <input className="px-3 py-2 rounded-lg bg-neutral-800" placeholder="Full name" value={form.fullname} onChange={(e)=>updateField("fullname", e.target.value)} required />
         </div>
         <input className="w-full px-3 py-2 rounded-lg bg-neutral-800" placeholder="Email" type="email" value={form.email} onChange={(e)=>updateField("email", e.target.value)} required />
         <input className="w-full px-3 py-2 rounded-lg bg-neutral-800" placeholder="Password" type="password" value={form.password} onChange={(e)=>updateField("password", e.target.value)} required />

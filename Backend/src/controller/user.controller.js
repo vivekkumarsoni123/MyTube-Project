@@ -182,26 +182,20 @@ const registerUser = asyncHandler( async (req, res) => {
         throw new ApiError(409, "User with email or username already exists")
     }
 
-    const avatarLocalPath = req.files?.avatar?.[0]?.path;
-    //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    const avatarFile = req.files?.avatar?.[0];
+    const coverImageFile = req.files?.coverImage?.[0];
 
-    let coverImageLocalPath;
-    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
-        coverImageLocalPath = req.files.coverImage[0].path
-    }
-    
-
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required")
+    if (!avatarFile) {
+        throw new ApiError(400, "Avatar file is required");
     }
 
-    const avatar = await uploadFileOnCloudinary(avatarLocalPath)
-    const coverImage = await uploadFileOnCloudinary(coverImageLocalPath)
+    // Upload the buffer to Cloudinary
+    const avatar = await uploadFileOnCloudinary(avatarFile.buffer);
+    const coverImage = coverImageFile ? await uploadFileOnCloudinary(coverImageFile.buffer) : null;
 
     if (!avatar) {
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(500, "Failed to upload avatar to Cloudinary");
     }
-   
 
     const user = await User.create({
         fullname: fullname,
@@ -297,16 +291,16 @@ const updateAvatar = asyncHandler( async (req, res) => {
 
     const user = req.user;
 
-    const avatarLocalPath = req.file?.path;
+    const avatarFile = req.file;
 
-    if (!avatarLocalPath) {
+    if (!avatarFile) {
         throw new ApiError(400, "Avatar file is required")
     }
 
-    const avatar = await uploadFileOnCloudinary(avatarLocalPath)
+    const avatar = await uploadFileOnCloudinary(avatarFile.buffer)
 
     if (!avatar) {
-        throw new ApiError(400, "Error in uploading coverImage file")
+        throw new ApiError(400, "Error in uploading avatar file")
     }
 
     user.avatar = avatar.url;
@@ -325,13 +319,13 @@ const updateCoverImage = asyncHandler( async (req, res) => {
 
     const user = req.user;
 
-    const coverImageLocalPath = req.file?.path;
+    const coverImageFile = req.file;
 
-    if (!coverImageLocalPath) {
+    if (!coverImageFile) {
         throw new ApiError(400, "coverImage file is required")
     }
 
-    const coverImage = await uploadFileOnCloudinary(coverImageLocalPath)
+    const coverImage = await uploadFileOnCloudinary(coverImageFile.buffer)
 
     if (!coverImage) {
         throw new ApiError(400, "Error in uploading coverImage file")

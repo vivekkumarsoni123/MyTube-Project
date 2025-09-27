@@ -130,8 +130,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 
     // Upload files to Cloudinary (or your storage)
-    const videoUpload = await uploadFileOnCloudinary(videoFile.path);
-    const thumbnailUpload = await uploadFileOnCloudinary(thumbnailFile.path);
+    const videoUpload = await uploadFileOnCloudinary(videoFile.buffer);
+    const thumbnailUpload = await uploadFileOnCloudinary(thumbnailFile.buffer);
 
     // Create video document
     const uploadedVideo = await Video.create(
@@ -150,18 +150,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
     
     if(!uploadedVideo) {
         throw new ApiError(500, "Error while publishing the video on cloudinary")
-    }
-    
-    // Delete temp files after upload
-    try {
-        fs.unlinkSync(videoFile.path)
-    } catch (err) {
-        // Optionally log error, but don't block response
-    }
-    try {
-        fs.unlinkSync(thumbnailFile.path)
-    } catch (err) {
-        // Optionally log error, but don't block response
     }
     
     return res.status(201)
@@ -208,13 +196,13 @@ const updateVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "All fields are required")
     }
 
-    const thumbnailfilepath = req?.file?.path; // <-- changed from req.files to req.file
+    const thumbnailFile = req?.file;
 
-    if(!thumbnailfilepath) {
+    if(!thumbnailFile) {
         throw new ApiError(400, "Thumbnail file is required")
     }
 
-    const thumbnail = await uploadFileOnCloudinary(thumbnailfilepath);
+    const thumbnail = await uploadFileOnCloudinary(thumbnailFile.buffer);
 
     if(!thumbnail) {
         throw new ApiError(500, "Error while uploading thumbnail on cloudinary")
@@ -235,7 +223,6 @@ const updateVideo = asyncHandler(async (req, res) => {
         throw new ApiError(404, "Error while updating video details")
     }
 
-    fs.unlinkSync(thumbnailfilepath); // <-- use fs.unlinkSync
 
 
     return res.status(200)
